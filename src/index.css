@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Outfit", sans-serif;
+  
+  --color-primary: #1e3a5f;
+  --color-primary-light: #2a5284;
+  --color-accent-blue: #3b82f6;
+  --color-gold-accent: #c5a059;
+  --color-neutral-gray: #f3f4f6;
+  --color-soft-bg: #f9fafb;
+  --color-blue-bg: #f5f9ff;
+  --color-blue-border: #e0e7ff;
+  --color-ink: #0f172a;
+}
+
+@layer base {
+  body {
+    @apply font-sans text-ink bg-white antialiased;
+  }
+  
+  h1, h2, h3, h4 {
+    @apply font-display tracking-tight;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-8 py-4 bg-primary text-white font-semibold rounded-none hover:bg-primary-light transition-all duration-300 uppercase text-xs tracking-widest;
+  }
+  
+  .btn-outline {
+    @apply px-8 py-4 border border-primary text-primary font-semibold rounded-none hover:bg-primary hover:text-white transition-all duration-300 uppercase text-xs tracking-widest;
+  }
+  
+  .btn-accent {
+    @apply px-8 py-4 bg-accent-blue text-white font-semibold rounded-none hover:bg-primary transition-all duration-300 uppercase text-xs tracking-widest;
+  }
+
+  .btn-gold {
+    @apply px-8 py-4 bg-gold-accent text-white font-semibold rounded-none hover:bg-primary transition-all duration-300 uppercase text-xs tracking-widest;
+  }
+
+  .section-container {
+    @apply max-w-7xl mx-auto px-6 lg:px-12;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .form-input {
+    @apply w-full px-4 py-2.5 bg-white border border-gray-200 focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none transition-all duration-200 text-sm;
+  }
+}
