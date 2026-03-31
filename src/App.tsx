@@ -45,7 +45,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center">
           <div className="flex items-center">
             <div className="flex flex-col">
-              <span className={`text-xl md:text-2xl font-bold tracking-tighter transition-colors duration-500 ${scrolled ? 'text-primary' : 'text-white'}`}>CHICAGO ELITE</span>
+              <span className={`text-xl md:text-2xl font-bold tracking-tighter transition-colors duration-500 ${scrolled ? 'text-primary' : 'text-white'}`}>Gomez Painting</span>
               <span className={`text-[9px] md:text-[10px] tracking-[0.3em] font-bold uppercase transition-colors duration-500 ${scrolled ? 'text-primary-light' : 'text-gold-accent'}`}>Painting & Trim</span>
             </div>
           </div>
