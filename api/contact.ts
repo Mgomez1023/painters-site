@@ -2,7 +2,7 @@ import {
   buildSuccessMessage,
   parseContactSubmission,
   sendContactSubmissionEmail,
-} from './_lib/contact-email';
+} from './_lib/contact-email.js';
 
 type ApiRequest = {
   method?: string;
