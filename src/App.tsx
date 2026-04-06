@@ -24,6 +24,10 @@ import workPhoto5976 from './WorkPhotos/WorkPhotos/IMG_5976.png';
 import workPhoto5990 from './WorkPhotos/WorkPhotos/IMG_5955.png';
 import aboutPhoto6038 from './WorkPhotos/WorkPhotos/IMG_5973.png';
 import {useContactForm} from './features/contact/useContactForm';
+import {LoginModal} from './features/photos/LoginModal';
+import {PhotosPage} from './features/photos/PhotosPage';
+import {useAdminSession} from './features/photos/useAdminSession';
+import {portfolioRoute} from './features/photos/shared';
 import {
   initialContactFormValues,
   initialNewsletterFormValues,
@@ -54,17 +58,39 @@ const SubmissionFeedback = ({
   );
 };
 
-const Navbar = () => {
+const Navbar = ({isPhotosPage}: {isPhotosPage: boolean}) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  const [scrolled, setScrolled] = useState(isPhotosPage);
 
   useEffect(() => {
+    if (isPhotosPage) {
+      setScrolled(true);
+      return;
+    }
+
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
+
+    handleScroll();
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [isPhotosPage]);
+
+  const navLinks = isPhotosPage
+    ? [
+        {label: 'Home', href: '/'},
+        {label: 'Contact', href: '/#contact'},
+      ]
+    : [
+        {label: 'Services', href: '#services'},
+        {label: 'Work', href: '#work'},
+        {label: 'Photos', href: portfolioRoute},
+        {label: 'About', href: '#about'},
+        {label: 'Contact', href: '#contact'},
+      ];
+
+  const ctaHref = isPhotosPage ? '/#contact' : '#contact';
 
   return (
     <nav className={`fixed w-full z-50 transition-all duration-500 ${scrolled ? 'bg-white shadow-sm py-2' : 'bg-transparent py-3'}`}>
@@ -80,13 +106,13 @@ const Navbar = () => {
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center space-x-8">
             <div className="flex space-x-6">
-              {['Services', 'Work', 'About', 'Contact'].map((item) => (
+              {navLinks.map((link) => (
                 <a 
-                  key={item} 
-                  href={`#${item.toLowerCase()}`} 
+                  key={link.label} 
+                  href={link.href} 
                   className={`text-[11px] font-bold uppercase tracking-widest transition-colors duration-500 ${scrolled ? 'text-ink hover:text-primary' : 'text-white hover:text-gold-accent'}`}
                 >
-                  {item}
+                  {link.label}
                 </a>
               ))}
             </div>
@@ -95,9 +121,12 @@ const Navbar = () => {
               <Phone size={14} className="text-gold-accent" />
               <span className="text-sm tracking-tight">(708) 420-1260</span>
             </div>
-            <button className={`${scrolled ? 'btn-gold py-2 px-6 text-[10px]' : 'px-6 py-2 bg-white text-primary font-semibold hover:bg-gold-accent hover:text-white transition-all duration-300 uppercase text-[10px] tracking-widest'}`}>
+            <a
+              href={ctaHref}
+              className={`${scrolled ? 'btn-gold py-2 px-6 text-[10px]' : 'px-6 py-2 bg-white text-primary font-semibold hover:bg-gold-accent hover:text-white transition-all duration-300 uppercase text-[10px] tracking-widest'}`}
+            >
               Get Quote
-            </button>
+            </a>
           </div>
 
           {/* Mobile menu button */}
@@ -119,14 +148,14 @@ const Navbar = () => {
             className="md:hidden absolute top-full left-0 w-full bg-white border-t border-neutral-gray shadow-xl overflow-hidden"
           >
             <div className="px-6 py-8 space-y-5">
-              {['Services', 'Work', 'About', 'Contact'].map((item) => (
+              {navLinks.map((link) => (
                 <a 
-                  key={item} 
-                  href={`#${item.toLowerCase()}`} 
+                  key={link.label} 
+                  href={link.href} 
                   className="block text-lg font-bold text-ink uppercase tracking-tight" 
                   onClick={() => setIsOpen(false)}
                 >
-                  {item}
+                  {link.label}
                 </a>
               ))}
               <div className="pt-6 border-t border-neutral-gray">
@@ -134,7 +163,9 @@ const Navbar = () => {
                   <Phone size={20} className="text-primary" />
                   <span className="text-lg">(708) 420-1260</span>
                 </div>
-                <button className="w-full btn-primary">Get Free Quote</button>
+                <a href={ctaHref} className="block w-full btn-primary text-center">
+                  Get Free Quote
+                </a>
               </div>
             </div>
           </motion.div>
@@ -177,10 +208,10 @@ const Hero = () => {
               Specializing in high-end interior finishes and detailed trim work for Chicago's most discerning homeowners.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <button className="btn-gold">Request a Quote</button>
-              <button className="px-8 py-4 border border-white/30 text-white font-semibold hover:bg-white hover:text-primary transition-all duration-300 uppercase text-xs tracking-widest">
+              <a href="#contact" className="btn-gold text-center">Request a Quote</a>
+              <a href={portfolioRoute} className="px-8 py-4 border border-white/30 text-white font-semibold hover:bg-white hover:text-primary transition-all duration-300 uppercase text-xs tracking-widest text-center">
                 Our Portfolio
-              </button>
+              </a>
             </div>
           </motion.div>
         </div>
@@ -429,6 +460,12 @@ const Gallery = () => {
             </motion.div>
           ))}
         </div>
+
+        <div className="mt-6 text-center">
+          <a href={portfolioRoute} className="btn-outline py-3 px-8 text-[10px]">
+            View Full Photos
+          </a>
+        </div>
       </div>
     </section>
   );
@@ -612,7 +649,15 @@ const ContactSection = () => {
   );
 };
 
-const Footer = () => {
+const Footer = ({
+  isPhotosPage,
+  isAuthenticated,
+  onAdminAction,
+}: {
+  isPhotosPage: boolean;
+  isAuthenticated: boolean;
+  onAdminAction: () => void;
+}) => {
   const newsletterForm = useContactForm({
     initialValues: initialNewsletterFormValues,
     buildPayload: (values) => ({
@@ -656,10 +701,10 @@ const Footer = () => {
           <div>
             <h4 className="text-[9px] font-bold uppercase tracking-[0.3em] mb-4 text-white/30">Quick Links</h4>
             <ul className="space-y-2 text-[9px] font-bold uppercase tracking-widest">
-              <li><a href="#work" className="hover:text-gold-accent transition-colors">Our Work</a></li>
-              <li><a href="#about" className="hover:text-gold-accent transition-colors">About Us</a></li>
-              <li><a href="#contact" className="hover:text-gold-accent transition-colors">Contact</a></li>
-              <li><a href="#" className="hover:text-gold-accent transition-colors">Get A Quote</a></li>
+              <li><a href={isPhotosPage ? '/#work' : '#work'} className="hover:text-gold-accent transition-colors">Our Work</a></li>
+              <li><a href={portfolioRoute} className="hover:text-gold-accent transition-colors">Photos</a></li>
+              <li><a href={isPhotosPage ? '/#about' : '#about'} className="hover:text-gold-accent transition-colors">About Us</a></li>
+              <li><a href={isPhotosPage ? '/#contact' : '#contact'} className="hover:text-gold-accent transition-colors">Contact</a></li>
             </ul>
           </div>
           
@@ -696,10 +741,17 @@ const Footer = () => {
         
         <div className="pt-6 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-[8px] font-bold uppercase tracking-widest text-white/20">
           <p>© 2026 Chicago Elite Painting & Trim. All rights reserved.</p>
-          <div className="flex gap-6">
+          <div className="flex flex-wrap items-center justify-center gap-6">
             <a href="#" className="hover:text-white transition-colors">Privacy</a>
             <a href="#" className="hover:text-white transition-colors">Terms</a>
             <a href="#" className="hover:text-white transition-colors">Accessibility</a>
+            <button
+              type="button"
+              onClick={onAdminAction}
+              className="text-[8px] font-bold uppercase tracking-[0.35em] text-white/25 transition-colors hover:text-gold-accent"
+            >
+              {isAuthenticated ? 'Admin' : 'Login'}
+            </button>
           </div>
         </div>
       </div>
@@ -708,19 +760,76 @@ const Footer = () => {
 };
 
 export default function App() {
+  const {session, isLoading, isSubmitting, login, logout} = useAdminSession();
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const currentPathname =
+    typeof window === 'undefined'
+      ? '/'
+      : normalizePathname(window.location.pathname);
+  const isPhotosPage = currentPathname === portfolioRoute;
+
+  async function handleLogin(email: string, password: string) {
+    await login(email, password);
+    setIsLoginOpen(false);
+
+    if (!isPhotosPage && typeof window !== 'undefined') {
+      window.location.assign(portfolioRoute);
+    }
+  }
+
+  function handleAdminAction() {
+    if (session.authenticated) {
+      if (!isPhotosPage && typeof window !== 'undefined') {
+        window.location.assign(portfolioRoute);
+      }
+
+      return;
+    }
+
+    setIsLoginOpen(true);
+  }
+
   return (
     <div className="min-h-screen selection:bg-accent-blue selection:text-white">
-      <Navbar />
+      <Navbar isPhotosPage={isPhotosPage} />
       <main>
-        <Hero />
-        <QuoteFormSection />
-        <TrustSection />
-        <Services />
-        <Gallery />
-        <About />
-        <ContactSection />
+        {isPhotosPage ? (
+          <PhotosPage
+            authenticated={session.authenticated}
+            adminEmail={session.email}
+            onLogout={logout}
+          />
+        ) : (
+          <>
+            <Hero />
+            <QuoteFormSection />
+            <TrustSection />
+            <Services />
+            <Gallery />
+            <About />
+            <ContactSection />
+          </>
+        )}
       </main>
-      <Footer />
+      <Footer
+        isPhotosPage={isPhotosPage}
+        isAuthenticated={session.authenticated}
+        onAdminAction={handleAdminAction}
+      />
+      <LoginModal
+        isOpen={isLoginOpen}
+        isSubmitting={isSubmitting || isLoading}
+        onClose={() => setIsLoginOpen(false)}
+        onSubmit={handleLogin}
+      />
     </div>
   );
+}
+
+function normalizePathname(pathname: string) {
+  if (pathname === '/') {
+    return pathname;
+  }
+
+  return pathname.replace(/\/+$/, '');
 }

@@ -198,31 +198,31 @@ function validateNewsletterSignup(
 }
 
 function buildEmailSubject(submission: ContactSubmissionRequest) {
+  const formTypeLabel = getFormTypeLabel(submission.formType);
+
   if (submission.formType === 'quote-request') {
-    return `New quote request from ${submission.fullName}`;
+    return `[Gomez Painting] ${formTypeLabel} | ${submission.fullName}`;
   }
 
   if (submission.formType === 'newsletter-signup') {
-    return `New newsletter signup from ${submission.email}`;
+    return `[Gomez Painting] ${formTypeLabel} | ${submission.email}`;
   }
 
-  return `New contact message from ${submission.fullName}`;
+  return `[Gomez Painting] ${formTypeLabel} | ${submission.fullName}`;
 }
 
 function buildEmailContent(submission: ContactSubmissionRequest) {
-  const submittedAt = new Intl.DateTimeFormat('en-US', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-    timeZone: 'America/Chicago',
-  }).format(new Date());
+  const submittedAt = formatSubmissionTimestamp();
+  const emailSubject = buildEmailSubject(submission);
+  const formTypeLabel = getFormTypeLabel(submission.formType);
 
   const details = getSubmissionDetails(submission);
   const detailRows = details
     .map(
       ([label, value]) => `
         <tr>
-          <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;font-weight:700;color:#12395b;width:180px;">${escapeHtml(label)}</td>
-          <td style="padding:10px 12px;border-bottom:1px solid #e5e7eb;color:#334155;">${escapeHtml(value)}</td>
+          <td style="padding:12px 14px;border-bottom:1px solid #e2e8f0;font-weight:700;color:#0f172a;width:180px;">${escapeHtml(label)}</td>
+          <td style="padding:12px 14px;border-bottom:1px solid #e2e8f0;color:#334155;">${escapeHtml(value)}</td>
         </tr>`,
     )
     .join('');
@@ -231,18 +231,25 @@ function buildEmailContent(submission: ContactSubmissionRequest) {
 
   return {
     html: `
-      <div style="background:#f8fafc;padding:32px;font-family:Arial,sans-serif;color:#0f172a;">
-        <div style="max-width:720px;margin:0 auto;background:#ffffff;border:1px solid #e2e8f0;">
+      <div style="background:#f1f5f9;padding:32px 16px;font-family:Arial,sans-serif;color:#0f172a;">
+        <div style="max-width:720px;margin:0 auto;background:#ffffff;border:1px solid #dbe4ee;border-radius:16px;overflow:hidden;">
           <div style="padding:24px 28px;background:#12395b;color:#ffffff;">
-            <p style="margin:0 0 8px;font-size:12px;letter-spacing:0.2em;text-transform:uppercase;color:#d4af37;">Website Lead</p>
-            <h1 style="margin:0;font-size:28px;line-height:1.2;">${escapeHtml(buildEmailSubject(submission))}</h1>
+            <p style="margin:0 0 10px;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#d4af37;">Website Lead</p>
+            <h1 style="margin:0 0 12px;font-size:26px;line-height:1.25;">${escapeHtml(emailSubject)}</h1>
+            <div style="display:inline-block;padding:6px 10px;border:1px solid rgba(255,255,255,0.18);border-radius:999px;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#e2e8f0;">
+              ${escapeHtml(formTypeLabel)}
+            </div>
           </div>
           <div style="padding:24px 28px;">
-            <p style="margin:0 0 20px;color:#475569;">Submitted ${escapeHtml(submittedAt)}</p>
-            <table style="width:100%;border-collapse:collapse;margin-bottom:24px;">
+            <div style="margin:0 0 20px;padding:16px 18px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;">
+              <p style="margin:0 0 8px;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;font-weight:700;color:#475569;">Submission Details</p>
+              <p style="margin:0 0 4px;color:#0f172a;"><strong>Submitted:</strong> ${escapeHtml(submittedAt)}</p>
+              <p style="margin:0;color:#0f172a;"><strong>Reply to:</strong> ${escapeHtml(submission.email)}</p>
+            </div>
+            <table style="width:100%;border-collapse:collapse;margin-bottom:24px;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;">
               <tbody>${detailRows}</tbody>
             </table>
-            <div style="border:1px solid #e2e8f0;padding:20px;background:#f8fafc;">
+            <div style="border:1px solid #e2e8f0;border-radius:12px;padding:20px;background:#f8fafc;">
               <p style="margin:0 0 12px;font-size:12px;letter-spacing:0.15em;text-transform:uppercase;font-weight:700;color:#12395b;">Message</p>
               <p style="margin:0;color:#334155;line-height:1.7;">${messageHtml}</p>
             </div>
@@ -250,8 +257,9 @@ function buildEmailContent(submission: ContactSubmissionRequest) {
         </div>
       </div>`,
     text: [
-      buildEmailSubject(submission),
+      emailSubject,
       `Submitted: ${submittedAt}`,
+      `Reply to: ${submission.email}`,
       '',
       ...details.map(([label, value]) => `${label}: ${value}`),
       '',
@@ -281,6 +289,15 @@ function getSubmissionDetails(submission: ContactSubmissionRequest) {
   }
 
   return details;
+}
+
+function formatSubmissionTimestamp() {
+  return new Intl.DateTimeFormat('en-US', {
+    dateStyle: 'medium',
+    timeStyle: 'medium',
+    timeZone: 'America/Chicago',
+    timeZoneName: 'short',
+  }).format(new Date());
 }
 
 function invalidSubmission(message: string): ValidationResult {
