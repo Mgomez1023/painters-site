@@ -1,12 +1,9 @@
-import { useState, useEffect } from 'react';
+import {useState, useEffect} from 'react';
 import { 
   Phone, 
   Menu, 
   X, 
   CheckCircle2, 
-  Paintbrush, 
-  Hammer, 
-  Layers, 
   ShieldCheck, 
   Clock, 
   MessageSquare,
@@ -18,7 +15,7 @@ import {
   Mail,
   Send
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import {motion, AnimatePresence} from 'motion/react';
 import workPhoto5958 from './WorkPhotos/WorkPhotos/IMG_6036.png';
 import workPhoto5959 from './WorkPhotos/WorkPhotos/IMG_5992.png';
 import workPhoto5960 from './WorkPhotos/WorkPhotos/IMG_5954.png';
@@ -26,6 +23,35 @@ import workPhoto5971 from './WorkPhotos/WorkPhotos/IMG_5975.png';
 import workPhoto5976 from './WorkPhotos/WorkPhotos/IMG_5976.png';
 import workPhoto5990 from './WorkPhotos/WorkPhotos/IMG_5955.png';
 import aboutPhoto6038 from './WorkPhotos/WorkPhotos/IMG_5973.png';
+import {useContactForm} from './features/contact/useContactForm';
+import {
+  initialContactFormValues,
+  initialQuoteFormValues,
+  type SubmissionStatus,
+} from './features/contact/types';
+
+const SubmissionFeedback = ({
+  status,
+  message,
+}: {
+  status: SubmissionStatus;
+  message: string;
+}) => {
+  if (!message) {
+    return null;
+  }
+
+  return (
+    <p
+      role={status === 'error' ? 'alert' : 'status'}
+      className={`text-[10px] font-bold uppercase tracking-widest ${
+        status === 'success' ? 'text-primary-light' : 'text-red-500'
+      }`}
+    >
+      {message}
+    </p>
+  );
+};
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -163,6 +189,18 @@ const Hero = () => {
 };
 
 const QuoteFormSection = () => {
+  const quoteForm = useContactForm({
+    initialValues: initialQuoteFormValues,
+    buildPayload: (values) => ({
+      formType: 'quote-request',
+      fullName: values.fullName,
+      phone: values.phone,
+      email: values.email,
+      projectType: values.projectType,
+      message: values.message,
+    }),
+  });
+
   return (
     <section className="relative -mt-10 z-20 pb-6">
       <div className="section-container">
@@ -193,21 +231,74 @@ const QuoteFormSection = () => {
             </div>
             
             <div className="lg:col-span-2">
-              <form className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <input type="text" placeholder="Full Name" className="form-input" required />
-                <input type="tel" placeholder="Phone Number" className="form-input" required />
-                <input type="email" placeholder="Email Address" className="form-input" required />
-                <select className="form-input appearance-none bg-no-repeat bg-[right_1rem_center]" required>
+              <form className="grid grid-cols-1 md:grid-cols-2 gap-3" onSubmit={quoteForm.handleSubmit}>
+                <input
+                  type="text"
+                  name="fullName"
+                  placeholder="Full Name"
+                  className="form-input"
+                  value={quoteForm.values.fullName}
+                  onChange={quoteForm.handleChange}
+                  required
+                />
+                <input
+                  type="tel"
+                  name="phone"
+                  placeholder="Phone Number"
+                  className="form-input"
+                  value={quoteForm.values.phone}
+                  onChange={quoteForm.handleChange}
+                  required
+                />
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email Address"
+                  className="form-input"
+                  value={quoteForm.values.email}
+                  onChange={quoteForm.handleChange}
+                  required
+                />
+                <select
+                  name="projectType"
+                  className="form-input appearance-none bg-no-repeat bg-[right_1rem_center]"
+                  value={quoteForm.values.projectType}
+                  onChange={quoteForm.handleChange}
+                  required
+                >
                   <option value="">Project Type</option>
-                  <option value="interior">Interior Painting</option>
-                  <option value="trim">Trim & Molding</option>
-                  <option value="accent">Accent Walls</option>
-                  <option value="full">Full Home Refresh</option>
+                  <option value="Interior Painting">Interior Painting</option>
+                  <option value="Trim & Molding">Trim & Molding</option>
+                  <option value="Accent Walls">Accent Walls</option>
+                  <option value="Full Home Refresh">Full Home Refresh</option>
                 </select>
-                <textarea placeholder="Tell us about your project..." className="form-input md:col-span-2 h-20 resize-none" required></textarea>
-                <button type="submit" className="btn-gold md:col-span-2 flex items-center justify-center gap-3 text-[11px]">
-                  Send Request <Send size={14} />
+                <textarea
+                  name="message"
+                  placeholder="Tell us about your project..."
+                  className="form-input md:col-span-2 h-20 resize-none"
+                  value={quoteForm.values.message}
+                  onChange={quoteForm.handleChange}
+                  required
+                ></textarea>
+                <button
+                  type="submit"
+                  className="btn-gold md:col-span-2 flex items-center justify-center gap-3 text-[11px] disabled:cursor-not-allowed disabled:opacity-70"
+                  disabled={quoteForm.isSubmitting}
+                  aria-busy={quoteForm.isSubmitting}
+                >
+                  {quoteForm.isSubmitting
+                    ? 'Sending Request...'
+                    : quoteForm.status === 'success'
+                      ? 'Request Sent'
+                      : 'Send Request'}{' '}
+                  <Send size={14} />
                 </button>
+                <div className="md:col-span-2">
+                  <SubmissionFeedback
+                    status={quoteForm.status}
+                    message={quoteForm.feedback}
+                  />
+                </div>
               </form>
             </div>
           </div>
@@ -392,6 +483,17 @@ const About = () => {
 };
 
 const ContactSection = () => {
+  const contactForm = useContactForm({
+    initialValues: initialContactFormValues,
+    buildPayload: (values) => ({
+      formType: 'contact-message',
+      fullName: values.fullName,
+      email: values.email,
+      subject: values.subject,
+      message: values.message,
+    }),
+  });
+
   return (
     <section id="contact" className="py-10 bg-blue-bg/40 border-t border-blue-border/30">
       <div className="section-container">
@@ -438,28 +540,69 @@ const ContactSection = () => {
           </div>
           
           <div className="bg-white p-6 md:p-7 shadow-lg border-t-4 border-primary">
-            <form className="space-y-3.5">
+            <form className="space-y-3.5" onSubmit={contactForm.handleSubmit}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                 <div className="space-y-1">
                   <label className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Full Name</label>
-                  <input type="text" className="form-input" required />
+                  <input
+                    type="text"
+                    name="fullName"
+                    className="form-input"
+                    value={contactForm.values.fullName}
+                    onChange={contactForm.handleChange}
+                    required
+                  />
                 </div>
                 <div className="space-y-1">
                   <label className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Email Address</label>
-                  <input type="email" className="form-input" required />
+                  <input
+                    type="email"
+                    name="email"
+                    className="form-input"
+                    value={contactForm.values.email}
+                    onChange={contactForm.handleChange}
+                    required
+                  />
                 </div>
               </div>
               <div className="space-y-1">
                 <label className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Subject</label>
-                <input type="text" className="form-input" required />
+                <input
+                  type="text"
+                  name="subject"
+                  className="form-input"
+                  value={contactForm.values.subject}
+                  onChange={contactForm.handleChange}
+                  required
+                />
               </div>
               <div className="space-y-1">
                 <label className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Message</label>
-                <textarea className="form-input h-28 resize-none" required></textarea>
+                <textarea
+                  name="message"
+                  className="form-input h-28 resize-none"
+                  value={contactForm.values.message}
+                  onChange={contactForm.handleChange}
+                  required
+                ></textarea>
               </div>
-              <button type="submit" className="w-full btn-gold flex items-center justify-center gap-3 text-[11px]">
-                Send Message <Send size={14} />
+              <button
+                type="submit"
+                className="w-full btn-gold flex items-center justify-center gap-3 text-[11px] disabled:cursor-not-allowed disabled:opacity-70"
+                disabled={contactForm.isSubmitting}
+                aria-busy={contactForm.isSubmitting}
+              >
+                {contactForm.isSubmitting
+                  ? 'Sending Message...'
+                  : contactForm.status === 'success'
+                    ? 'Message Sent'
+                    : 'Send Message'}{' '}
+                <Send size={14} />
               </button>
+              <SubmissionFeedback
+                status={contactForm.status}
+                message={contactForm.feedback}
+              />
             </form>
           </div>
         </div>
