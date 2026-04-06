@@ -323,21 +323,17 @@ export function PhotosPage({
                 </span>
               </div>
               <h1 className="text-4xl font-bold text-primary md:text-6xl">
-                Finished rooms, trim, and detail work with a cleaner presentation.
+                Finished rooms, trim, and detail work.
               </h1>
-              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-gray-500 md:text-base">
-                Browse recent painting and trim projects from homes across Chicago
-                and the North Shore. Each image opens full-screen for a closer look.
-              </p>
             </div>
 
             <div className="border-l border-gold-accent/50 bg-white/80 px-5 py-6 shadow-lg">
               <p className="text-[9px] font-bold uppercase tracking-[0.35em] text-primary-light">
                 Curated Work
               </p>
-              <p className="mt-3 text-sm leading-relaxed text-gray-500">
-                Public visitors always see the latest uploaded photos. Admin tools
-                stay hidden unless the secure footer login is active.
+              <p>
+                Browse recent painting and trim projects from homes across Chicago
+                and the North Shore. Each image opens full-screen for a closer look.
               </p>
               {authenticated ? (
                 <div className="mt-5 flex items-center justify-between gap-4 border-t border-blue-border/60 pt-4">

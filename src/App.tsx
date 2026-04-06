@@ -342,23 +342,23 @@ const QuoteFormSection = () => {
 
 const TrustSection = () => {
   const features = [
-    { icon: <ShieldCheck size={20} />, title: "Impeccable Prep", desc: "Total protection for your home." },
-    { icon: <Clock size={20} />, title: "On-Time Delivery", desc: "We respect your schedule." },
-    { icon: <CheckCircle2 size={20} />, title: "Master Finish", desc: "Sharp lines, smooth surfaces." },
-    { icon: <MessageSquare size={20} />, title: "Clear Pricing", desc: "No hidden costs or surprises." },
+    { icon: <ShieldCheck size={40} />, title: "Impeccable Prep", desc: "Total protection for your home." },
+    { icon: <Clock size={40} />, title: "On-Time Delivery", desc: "We respect your schedule." },
+    { icon: <CheckCircle2 size={40} />, title: "Master Finish", desc: "Sharp lines, smooth surfaces." },
+    { icon: <MessageSquare size={40} />, title: "Clear Pricing", desc: "No hidden costs or surprises." },
   ];
 
   return (
-    <section className="py-8 bg-blue-bg/30 border-y border-blue-border/50">
+    <section className="py-18 bg-blue-bg/30 border-y border-blue-border/50">
       <div className="section-container">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 md:gap-0">
           {features.map((f, i) => (
             <div key={i} className="flex flex-col items-center text-center group">
               <div className="mb-2 text-primary-light transition-transform duration-300 group-hover:scale-110">
                 {f.icon}
               </div>
-              <h3 className="text-[9px] font-bold text-primary uppercase tracking-widest mb-1">{f.title}</h3>
-              <p className="text-gray-400 text-[8px] font-medium leading-relaxed">{f.desc}</p>
+              <h3 className="text-[12px] font-bold text-primary uppercase tracking-widest mb-1">{f.title}</h3>
+              <p className="text-gray-400 text-[12px] font-medium leading-relaxed">{f.desc}</p>
             </div>
           ))}
         </div>
@@ -402,7 +402,6 @@ const Services = () => {
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-primary leading-tight">Professional finishes for every surface.</h2>
           </div>
-          <button className="btn-outline py-2 px-6 text-[10px]">All Services</button>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-blue-border/50 border border-blue-border/50 overflow-hidden shadow-sm">
@@ -446,7 +445,7 @@ const Gallery = () => {
             <span className="text-primary-light font-bold uppercase tracking-widest text-[9px]">Portfolio</span>
             <div className="w-4 h-px bg-primary-light"></div>
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-primary">Recent Transformations</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-primary">Recent Projects</h2>
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
