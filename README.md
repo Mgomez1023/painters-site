@@ -4,7 +4,7 @@
 
 # Chicago Elite Painting & Trim
 
-The site now sends both website forms through a Vercel serverless API route using Resend.
+The site now sends all website lead forms through a Vercel serverless API route using Resend.
 
 ## Environment variables
 
@@ -12,11 +12,9 @@ Add these in your local `.env.local` file and in the Vercel project settings:
 
 ```bash
 RESEND_API_KEY=re_123
-# Optional but recommended once your sending domain is verified in Resend
-RESEND_FROM_EMAIL="Chicago Elite Painting <hello@yourdomain.com>"
 ```
 
-`RESEND_API_KEY` is required. `RESEND_FROM_EMAIL` is optional and falls back to `onboarding@resend.dev`.
+The email route uses Resend with the temporary sender `Gomez Painting <onboarding@resend.dev>`. Only `RESEND_API_KEY` is required in the environment for this setup.
 
 ## Run locally
 
@@ -31,11 +29,11 @@ RESEND_FROM_EMAIL="Chicago Elite Painting <hello@yourdomain.com>"
 
 1. Import the repo into Vercel.
 2. Set `RESEND_API_KEY` in Project Settings > Environment Variables.
-3. Optionally set `RESEND_FROM_EMAIL` after verifying your sending domain in Resend.
-4. Deploy. The frontend will build with Vite and the mail handler will deploy from `api/contact.ts`.
+3. Deploy. The frontend will build with Vite and the mail handler will deploy from `api/contact.ts`.
 
 ## Form behavior
 
 - Quote form submissions and contact form submissions both post to `/api/contact`.
-- Emails are sent to `marting2046@gmail.com` and `Martin2mvp@yahoo.com`.
+- Footer newsletter signup also posts to `/api/contact`.
+- Emails are sent to `marting2046@gmail.com`.
 - The sender can reply directly to the customer because the API route sets `replyTo` to the submitted email address.

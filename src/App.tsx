@@ -26,6 +26,7 @@ import aboutPhoto6038 from './WorkPhotos/WorkPhotos/IMG_5973.png';
 import {useContactForm} from './features/contact/useContactForm';
 import {
   initialContactFormValues,
+  initialNewsletterFormValues,
   initialQuoteFormValues,
   type SubmissionStatus,
 } from './features/contact/types';
@@ -612,6 +613,17 @@ const ContactSection = () => {
 };
 
 const Footer = () => {
+  const newsletterForm = useContactForm({
+    initialValues: initialNewsletterFormValues,
+    buildPayload: (values) => ({
+      formType: 'newsletter-signup',
+      fullName: 'Newsletter Subscriber',
+      email: values.email,
+      subject: 'Newsletter signup',
+      message: 'Requested seasonal maintenance tips and project inspiration.',
+    }),
+  });
+
   return (
     <footer className="bg-primary text-white pt-12 pb-6">
       <div className="section-container">
@@ -654,10 +666,31 @@ const Footer = () => {
           <div>
             <h4 className="text-[9px] font-bold uppercase tracking-[0.3em] mb-4 text-white/30">Newsletter</h4>
             <p className="text-[9px] text-white/40 mb-3 leading-relaxed">Join for seasonal maintenance tips and project inspiration.</p>
-            <div className="flex">
-              <input type="email" placeholder="Email" className="bg-white/5 border border-white/10 px-3 py-2.5 text-[9px] w-full focus:outline-none focus:border-gold-accent text-white" />
-              <button className="bg-gold-accent text-white px-3 py-2.5 hover:bg-white hover:text-primary transition-all"><ArrowRight size={14} /></button>
-            </div>
+            <form className="space-y-2" onSubmit={newsletterForm.handleSubmit}>
+              <div className="flex">
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  className="bg-white/5 border border-white/10 px-3 py-2.5 text-[9px] w-full focus:outline-none focus:border-gold-accent text-white"
+                  value={newsletterForm.values.email}
+                  onChange={newsletterForm.handleChange}
+                  required
+                />
+                <button
+                  type="submit"
+                  className="bg-gold-accent text-white px-3 py-2.5 hover:bg-white hover:text-primary transition-all disabled:cursor-not-allowed disabled:opacity-70"
+                  disabled={newsletterForm.isSubmitting}
+                  aria-busy={newsletterForm.isSubmitting}
+                >
+                  <ArrowRight size={14} />
+                </button>
+              </div>
+              <SubmissionFeedback
+                status={newsletterForm.status}
+                message={newsletterForm.feedback}
+              />
+            </form>
           </div>
         </div>
         

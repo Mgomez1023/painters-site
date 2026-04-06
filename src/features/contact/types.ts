@@ -1,6 +1,9 @@
 export const contactApiRoute = '/api/contact';
 
-export type ContactFormType = 'quote-request' | 'contact-message';
+export type ContactFormType =
+  | 'quote-request'
+  | 'contact-message'
+  | 'newsletter-signup';
 
 export type QuoteFormValues = {
   fullName: string;
@@ -15,6 +18,10 @@ export type ContactFormValues = {
   email: string;
   subject: string;
   message: string;
+};
+
+export type NewsletterFormValues = {
+  email: string;
 };
 
 export type ContactSubmissionRequest = {
@@ -47,4 +54,8 @@ export const initialContactFormValues: ContactFormValues = {
   email: '',
   subject: '',
   message: '',
+};
+
+export const initialNewsletterFormValues: NewsletterFormValues = {
+  email: '',
 };

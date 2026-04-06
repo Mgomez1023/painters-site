@@ -4,12 +4,20 @@ import type {
   ContactSubmissionRequest,
 } from '../../src/features/contact/types';
 
-const RESEND_RECIPIENTS = [
-  'marting2046@gmail.com',
-  'Martin2mvp@yahoo.com',
-];
+const RESEND_FROM_EMAIL = 'Gomez Painting <onboarding@resend.dev>';
+const RESEND_RECIPIENTS = ['marting2046@gmail.com'];
 
-const DEFAULT_FROM_EMAIL = 'Chicago Elite Painting <onboarding@resend.dev>';
+class ContactDeliveryError extends Error {
+  statusCode: number;
+  details?: unknown;
+
+  constructor(message: string, statusCode = 500, details?: unknown) {
+    super(message);
+    this.name = 'ContactDeliveryError';
+    this.statusCode = statusCode;
+    this.details = details;
+  }
+}
 
 type ValidationResult =
   | {
@@ -38,6 +46,10 @@ export function parseContactSubmission(body: unknown): ValidationResult {
     return validateContactMessage(input);
   }
 
+  if (formType === 'newsletter-signup') {
+    return validateNewsletterSignup(input);
+  }
+
   return invalidSubmission('Invalid form type.');
 }
 
@@ -47,27 +59,56 @@ export async function sendContactSubmissionEmail(
   const apiKey = process.env.RESEND_API_KEY?.trim();
 
   if (!apiKey) {
-    throw new Error('Missing RESEND_API_KEY environment variable.');
+    throw new ContactDeliveryError(
+      'Missing RESEND_API_KEY environment variable.',
+      500,
+    );
   }
 
   const resend = new Resend(apiKey);
   const subject = buildEmailSubject(submission);
-  const from = process.env.RESEND_FROM_EMAIL?.trim() || DEFAULT_FROM_EMAIL;
   const emailContent = buildEmailContent(submission);
 
-  await resend.emails.send({
-    from,
-    to: RESEND_RECIPIENTS,
-    subject,
-    html: emailContent.html,
-    text: emailContent.text,
-    replyTo: submission.email,
-  });
+  let data: Awaited<ReturnType<typeof resend.emails.send>>['data'];
+  let error: Awaited<ReturnType<typeof resend.emails.send>>['error'];
+
+  try {
+    ({data, error} = await resend.emails.send({
+      from: RESEND_FROM_EMAIL,
+      to: RESEND_RECIPIENTS,
+      subject,
+      html: emailContent.html,
+      text: emailContent.text,
+      replyTo: submission.email,
+    }));
+  } catch (sendError) {
+    throw toContactDeliveryError(sendError);
+  }
+
+  if (error) {
+    throw new ContactDeliveryError(
+      getPublicErrorMessage(error),
+      502,
+      error,
+    );
+  }
+
+  if (!data?.id) {
+    throw new ContactDeliveryError(
+      'Email delivery provider did not confirm the message send.',
+      502,
+      data,
+    );
+  }
 }
 
 export function buildSuccessMessage(formType: ContactFormType) {
   if (formType === 'quote-request') {
     return 'Your quote request has been sent. We will follow up within 24 hours.';
+  }
+
+  if (formType === 'newsletter-signup') {
+    return 'Thanks for subscribing. We will keep you posted.';
   }
 
   return 'Your message has been sent. We will be in touch shortly.';
@@ -131,9 +172,38 @@ function validateContactMessage(
   };
 }
 
+function validateNewsletterSignup(
+  input: Record<string, unknown>,
+): ValidationResult {
+  const email = getRequiredString(input.email);
+
+  if (!email) {
+    return invalidSubmission('Please provide your email address.');
+  }
+
+  if (!isValidEmail(email)) {
+    return invalidSubmission('Please provide a valid email address.');
+  }
+
+  return {
+    ok: true,
+    submission: {
+      formType: 'newsletter-signup',
+      fullName: 'Newsletter Subscriber',
+      email,
+      subject: 'Newsletter signup',
+      message: 'Requested seasonal maintenance tips and project inspiration.',
+    },
+  };
+}
+
 function buildEmailSubject(submission: ContactSubmissionRequest) {
   if (submission.formType === 'quote-request') {
     return `New quote request from ${submission.fullName}`;
+  }
+
+  if (submission.formType === 'newsletter-signup') {
+    return `New newsletter signup from ${submission.email}`;
   }
 
   return `New contact message from ${submission.fullName}`;
@@ -193,7 +263,7 @@ function buildEmailContent(submission: ContactSubmissionRequest) {
 
 function getSubmissionDetails(submission: ContactSubmissionRequest) {
   const details: Array<[string, string]> = [
-    ['Form type', submission.formType === 'quote-request' ? 'Quote Request' : 'Contact Message'],
+    ['Form type', getFormTypeLabel(submission.formType)],
     ['Full name', submission.fullName],
     ['Email', submission.email],
   ];
@@ -219,6 +289,52 @@ function invalidSubmission(message: string): ValidationResult {
     statusCode: 400,
     message,
   };
+}
+
+function getPublicErrorMessage(error: {message?: string; name?: string}) {
+  const message = error.message?.trim().toLowerCase() || '';
+
+  if (
+    message.includes('testing emails to your own email address') ||
+    message.includes('verify a domain') ||
+    message.includes('resend.dev')
+  ) {
+    return 'Email delivery is limited by the temporary Resend sender. Confirm this inbox is allowed in your Resend account or switch to a verified domain sender.';
+  }
+
+  return 'We could not send your message right now. Please call or email us directly.';
+}
+
+function toContactDeliveryError(error: unknown) {
+  if (error instanceof ContactDeliveryError) {
+    return error;
+  }
+
+  if (error instanceof Error) {
+    return new ContactDeliveryError(
+      getPublicErrorMessage(error),
+      502,
+      error,
+    );
+  }
+
+  return new ContactDeliveryError(
+    'We could not send your message right now. Please call or email us directly.',
+    502,
+    error,
+  );
+}
+
+function getFormTypeLabel(formType: ContactFormType) {
+  if (formType === 'quote-request') {
+    return 'Quote Request';
+  }
+
+  if (formType === 'newsletter-signup') {
+    return 'Newsletter Signup';
+  }
+
+  return 'Contact Message';
 }
 
 function getRequiredString(value: unknown) {

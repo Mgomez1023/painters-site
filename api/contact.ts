@@ -42,12 +42,27 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       message: buildSuccessMessage(parsedSubmission.submission.formType),
     });
   } catch (error) {
-    console.error('Failed to send contact submission email.', error);
+    const statusCode =
+      error instanceof Error &&
+      'statusCode' in error &&
+      typeof error.statusCode === 'number'
+        ? error.statusCode
+        : 500;
 
-    return res.status(500).json({
+    const message =
+      error instanceof Error
+        ? error.message
+        : 'We could not send your message right now. Please call or email us directly.';
+
+    console.error('Failed to send contact submission email.', {
+      error,
+      message,
+      requestBody: req.body,
+    });
+
+    return res.status(statusCode).json({
       ok: false,
-      message:
-        'We could not send your message right now. Please call or email us directly.',
+      message,
     });
   }
 }
