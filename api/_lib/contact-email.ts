@@ -4,8 +4,8 @@ import type {
   ContactSubmissionRequest,
 } from '../../src/features/contact/types';
 
-const RESEND_FROM_EMAIL = 'Gomez Painting <onboarding@resend.dev>';
-const RESEND_RECIPIENTS = ['marting2046@gmail.com'];
+const RESEND_FROM_EMAIL = 'Gomez Painting <hello@gomezpainting.org>';
+const RESEND_RECIPIENTS = ['marting2046@gmail.com', 'martin2mvp@yahoo.com'];
 
 class ContactDeliveryError extends Error {
   statusCode: number;
