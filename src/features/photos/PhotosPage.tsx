@@ -502,7 +502,7 @@ export function PhotosPage({
                 <p className="text-[9px] font-bold uppercase tracking-[0.35em] text-gold-accent">
                   Manage Existing Photos
                 </p>
-                <div className="mt-4 max-h-[38rem] space-y-3 overflow-y-auto pr-1">
+                <div className="mt-4 max-h-[30rem] space-y-3 overflow-y-auto pr-1">
                   {photos.length ? (
                     photos.map((photo) => (
                       <div
