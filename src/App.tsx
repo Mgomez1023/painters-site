@@ -23,6 +23,7 @@ import workPhoto5971 from './WorkPhotos/WorkPhotos/IMG_5975.png';
 import workPhoto5976 from './WorkPhotos/WorkPhotos/IMG_5976.png';
 import workPhoto5990 from './WorkPhotos/WorkPhotos/IMG_5955.png';
 import aboutPhoto6038 from './WorkPhotos/WorkPhotos/IMG_5973.png';
+import heroPhoto1 from './WorkPhotos/WorkPhotos/Hero1.png';
 import {useContactForm} from './features/contact/useContactForm';
 import {LoginModal} from './features/photos/LoginModal';
 import {PhotosPage} from './features/photos/PhotosPage';
@@ -34,6 +35,12 @@ import {
   initialQuoteFormValues,
   type SubmissionStatus,
 } from './features/contact/types';
+
+const heroBackgroundImage = {
+  src: heroPhoto1,
+  alt: 'Freshly painted interior wall and trim detail',
+  position: 'center center',
+} as const;
 
 const SubmissionFeedback = ({
   status,
@@ -90,13 +97,13 @@ const Navbar = ({isPhotosPage}: {isPhotosPage: boolean}) => {
         {label: 'Contact', href: '#contact'},
       ];
 
-  const ctaHref = isPhotosPage ? '/#contact' : '#contact';
+  const ctaHref = isPhotosPage ? '/#contact' : '#quote';
 
   return (
     <nav className={`fixed w-full z-50 transition-all duration-500 ${scrolled ? 'bg-white shadow-sm py-2' : 'bg-transparent py-3'}`}>
       <div className="section-container">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center">
+        <div className="grid grid-cols-[auto_1fr_auto] items-center gap-4 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
+          <div className="flex items-center justify-self-start">
             <div className="flex flex-col">
               <span className={`text-xl md:text-2xl font-bold tracking-tighter transition-colors duration-500 ${scrolled ? 'text-primary' : 'text-white'}`}>Gomez Painting</span>
               <span className={`text-[9px] md:text-[10px] tracking-[0.3em] font-bold uppercase transition-colors duration-500 ${scrolled ? 'text-primary-light' : 'text-gold-accent'}`}>Painting & Trim</span>
@@ -104,19 +111,19 @@ const Navbar = ({isPhotosPage}: {isPhotosPage: boolean}) => {
           </div>
           
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center space-x-8">
-            <div className="flex space-x-6">
-              {navLinks.map((link) => (
-                <a 
-                  key={link.label} 
-                  href={link.href} 
-                  className={`text-[11px] font-bold uppercase tracking-widest transition-colors duration-500 ${scrolled ? 'text-ink hover:text-primary' : 'text-white hover:text-gold-accent'}`}
-                >
-                  {link.label}
-                </a>
-              ))}
-            </div>
-            <div className={`h-4 w-px transition-colors duration-500 ${scrolled ? 'bg-blue-border' : 'bg-white/20'}`}></div>
+          <div className="hidden md:flex items-center justify-center gap-6">
+            {navLinks.map((link) => (
+              <a 
+                key={link.label} 
+                href={link.href} 
+                className={`text-[11px] font-bold uppercase tracking-widest transition-colors duration-500 ${scrolled ? 'text-ink hover:text-primary' : 'text-white hover:text-gold-accent'}`}
+              >
+                {link.label}
+              </a>
+            ))}
+          </div>
+
+          <div className="hidden md:flex items-center justify-self-end gap-4">
             <div className={`flex items-center gap-2 font-bold transition-colors duration-500 ${scrolled ? 'text-ink' : 'text-white'}`}>
               <Phone size={14} className="text-gold-accent" />
               <span className="text-sm tracking-tight">(708) 420-1260</span>
@@ -130,7 +137,7 @@ const Navbar = ({isPhotosPage}: {isPhotosPage: boolean}) => {
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden flex items-center justify-self-end">
             <button onClick={() => setIsOpen(!isOpen)} className={`p-2 transition-colors duration-500 ${scrolled ? 'text-ink' : 'text-white'}`}>
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -164,7 +171,7 @@ const Navbar = ({isPhotosPage}: {isPhotosPage: boolean}) => {
                   <span className="text-lg">(708) 420-1260</span>
                 </div>
                 <a href={ctaHref} className="block w-full btn-primary text-center">
-                  Get Free Quote
+                  Get Quote
                 </a>
               </div>
             </div>
@@ -177,39 +184,46 @@ const Navbar = ({isPhotosPage}: {isPhotosPage: boolean}) => {
 
 const Hero = () => {
   return (
-    <section className="relative h-[70vh] flex items-center overflow-hidden">
+    <section
+      className="relative flex min-h-screen items-end overflow-hidden bg-primary"
+      style={{minHeight: '100svh'}}
+    >
       <div className="absolute inset-0 z-0">
         <img 
-          src="https://images.unsplash.com/photo-1621905251918-48416bd8575a?auto=format&fit=crop&q=80&w=1920" 
-          alt="Professional painter rolling a wall" 
+          src={heroBackgroundImage.src}
+          alt={heroBackgroundImage.alt}
           className="w-full h-full object-cover"
+          style={{objectPosition: heroBackgroundImage.position}}
+          loading="eager"
           referrerPolicy="no-referrer"
         />
-        <div className="absolute inset-0 bg-primary/70"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(8,18,31,0.84)_0%,rgba(21,42,69,0.7)_38%,rgba(30,58,95,0.28)_72%,rgba(30,58,95,0.18)_100%)]"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(8,18,31,0.2)_0%,rgba(8,18,31,0)_42%,rgba(8,18,31,0.56)_100%)]"></div>
       </div>
       
-      <div className="relative z-10 section-container w-full">
+      <div className="relative z-10 section-container w-full pb-10 pt-32 sm:pb-12 md:pt-40 md:pb-16 lg:pb-20">
         <div className="max-w-3xl">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-8 h-px bg-gold-accent"></div>
-              <span className="text-gold-accent font-bold uppercase tracking-[0.4em] text-[10px]">
-                Premium Interior Craftsmanship
+            <div className="mb-4 flex items-center gap-3">
+              <div className="h-px w-10 bg-gold-accent"></div>
+              <span className="text-[10px] font-bold uppercase tracking-[0.38em] text-gold-accent">
+                Chicago & North Shore
               </span>
             </div>
-            <h1 className="text-5xl md:text-7xl font-bold text-white leading-[1.1] mb-4 text-balance">
-              Chicago Interior Painting <span className="text-gold-accent">Refined.</span>
+            <h1 className="text-4xl font-bold leading-[1.04] text-white text-balance sm:text-5xl md:text-6xl lg:text-7xl">
+              Painting & Trim Done With Precision
             </h1>
-            <p className="text-base md:text-lg text-white/70 mb-6 leading-relaxed max-w-xl">
-              Specializing in high-end interior finishes and detailed trim work for Chicago's most discerning homeowners.
+            <p className="mt-4 max-w-lg text-sm leading-relaxed text-white/76 sm:text-base">
+              Clean prep, sharp trim lines, and a finish that feels considered from the first room to the last.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <a href="#contact" className="btn-gold text-center">Request a Quote</a>
-              <a href={portfolioRoute} className="px-8 py-4 border border-white/30 text-white font-semibold hover:bg-white hover:text-primary transition-all duration-300 uppercase text-xs tracking-widest text-center">
+
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <a href="#quote" className="btn-gold text-center">Get Quote</a>
+              <a href={portfolioRoute} className="px-8 py-4 border border-white/28 bg-white/6 text-center text-xs font-semibold uppercase tracking-widest text-white backdrop-blur-[2px] transition-all duration-300 hover:bg-white hover:text-primary">
                 Our Portfolio
               </a>
             </div>
@@ -234,7 +248,7 @@ const QuoteFormSection = () => {
   });
 
   return (
-    <section className="relative -mt-10 z-20 pb-6">
+    <section id="quote" className="bg-white py-8 md:py-12">
       <div className="section-container">
         <div className="bg-white shadow-2xl p-6 md:p-8 border-t-4 border-gold-accent">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
