@@ -1,4 +1,5 @@
 import {useState, useEffect} from 'react';
+import {Analytics} from '@vercel/analytics/react';
 import { 
   Phone, 
   Menu, 
@@ -835,6 +836,7 @@ export default function App() {
         onClose={() => setIsLoginOpen(false)}
         onSubmit={handleLogin}
       />
+      <Analytics />
     </div>
   );
 }
