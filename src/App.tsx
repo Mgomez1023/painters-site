@@ -104,10 +104,31 @@ const Navbar = ({isPhotosPage}: {isPhotosPage: boolean}) => {
     <nav className={`fixed w-full z-50 transition-all duration-500 ${scrolled ? 'bg-white shadow-sm py-2' : 'bg-transparent py-3'}`}>
       <div className="section-container">
         <div className="grid grid-cols-[auto_1fr_auto] items-center gap-4 md:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
-          <div className="flex items-center justify-self-start">
+
+        
+          <div className="flex items-center justify-self-start gap-3">
+            <img
+              src="/marom-favicon-512.png"
+              alt="Marom Painting logo"
+              className="h-10 w-10 md:h-12 md:w-12 object-contain"
+            />
+
             <div className="flex flex-col">
-              <span className={`text-xl md:text-2xl font-bold tracking-tighter transition-colors duration-500 ${scrolled ? 'text-primary' : 'text-white'}`}>Gomez Painting</span>
-              <span className={`text-[9px] md:text-[10px] tracking-[0.3em] font-bold uppercase transition-colors duration-500 ${scrolled ? 'text-primary-light' : 'text-gold-accent'}`}>Painting & Trim</span>
+              <span
+                className={`text-xl md:text-2xl font-bold tracking-tighter transition-colors duration-500 ${
+                  scrolled ? 'text-primary' : 'text-white'
+                }`}
+              >
+                Marom Painting
+              </span>
+
+              <span
+                className={`text-[9px] md:text-[10px] tracking-[0.3em] font-bold uppercase transition-colors duration-500 ${
+                  scrolled ? 'text-primary-light' : 'text-gold-accent'
+                }`}
+              >
+                Painting & Trim
+              </span>
             </div>
           </div>
           
