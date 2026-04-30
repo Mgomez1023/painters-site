@@ -1,7 +1,6 @@
 import {useState} from 'react';
 import type {FormEvent} from 'react';
 import {ArrowRight, Mail} from 'lucide-react';
-import {submitContactSubmission} from '../features/contact/api';
 
 type EmailSignupCTAProps = {
   sourceTitle: string;
@@ -12,6 +11,7 @@ type EmailSignupCTAProps = {
 type EmailSignupValues = {
   firstName: string;
   email: string;
+  honeypot: string;
 };
 
 export function EmailSignupCTA({
@@ -22,6 +22,7 @@ export function EmailSignupCTA({
   const [values, setValues] = useState<EmailSignupValues>({
     firstName: '',
     email: '',
+    honeypot: '',
   });
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>(
     'idle',
@@ -37,17 +38,17 @@ export function EmailSignupCTA({
       await submitEmailSignup({
         ...values,
         sourceTitle,
-        sourcePath,
+        sourcePath: getSourcePath(sourcePath),
       });
-      setValues({firstName: '', email: ''});
+      setValues({firstName: '', email: '', honeypot: ''});
       setStatus('success');
-      setFeedback("Thanks — you're on the list.");
+      setFeedback('Thanks — you’re on the list.');
     } catch (error) {
       setStatus('error');
       setFeedback(
         error instanceof Error
           ? error.message
-          : 'We could not send that signup right now.',
+          : 'We could not add you to the list right now. Please try again later.',
       );
     }
   }
@@ -98,11 +99,36 @@ export function EmailSignupCTA({
               and North Shore homeowners.
             </p>
           ) : null}
+          <p
+            className={
+              isCompact
+                ? 'mt-2 text-[9px] leading-relaxed text-white/35'
+                : 'mt-3 text-xs leading-relaxed text-gray-500'
+            }
+          >
+            Occasional painting tips and project ideas. Unsubscribe anytime.
+          </p>
         </div>
 
         <form className={isCompact ? 'mt-3 space-y-2' : 'space-y-3'} onSubmit={handleSubmit}>
-          <input type="hidden" name="sourcePath" value={sourcePath} />
+          <input type="hidden" name="sourcePath" value={getSourcePath(sourcePath)} />
           <input type="hidden" name="sourceTitle" value={sourceTitle} />
+          <label className="hidden" aria-hidden="true">
+            Leave this field blank
+            <input
+              type="text"
+              name="website"
+              tabIndex={-1}
+              autoComplete="off"
+              value={values.honeypot}
+              onChange={(event) =>
+                setValues((currentValues) => ({
+                  ...currentValues,
+                  honeypot: event.target.value,
+                }))
+              }
+            />
+          </label>
           {!isCompact ? (
             <label className="block">
               <span className="sr-only">First name</span>
@@ -179,24 +205,50 @@ export function EmailSignupCTA({
 async function submitEmailSignup({
   firstName,
   email,
+  honeypot,
   sourceTitle,
   sourcePath,
 }: EmailSignupValues & {
   sourceTitle: string;
   sourcePath: string;
 }) {
-  // Current behavior: send the signup through the existing website lead handler.
-  // Future replacement point: connect this function to Mailchimp, Brevo, Supabase,
-  // or another list provider when Marom Painting is ready to store subscribers.
-  await submitContactSubmission({
-    formType: 'newsletter-signup',
-    fullName: firstName.trim() || 'Newsletter Subscriber',
-    email,
-    subject: 'Email list signup',
-    message: [
-      'Requested seasonal painting tips, reminders, and project ideas.',
-      `Source page: ${sourceTitle}`,
-      `Source path: ${sourcePath}`,
-    ].join('\n'),
+  const response = await fetch('/api/email-signup', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      firstName,
+      email,
+      honeypot,
+      sourceTitle,
+      sourcePath,
+    }),
   });
+  const responseBody = await readEmailSignupResponse(response);
+
+  if (!response.ok || !responseBody?.ok) {
+    throw new Error(
+      responseBody?.message ||
+        'We could not add you to the list right now. Please try again later.',
+    );
+  }
+
+  return responseBody;
+}
+
+function getSourcePath(sourcePath: string) {
+  const currentPath = typeof window === 'undefined' ? '' : window.location.pathname;
+  return currentPath || sourcePath;
+}
+
+async function readEmailSignupResponse(response: Response) {
+  try {
+    return (await response.json()) as {
+      ok: boolean;
+      message: string;
+    };
+  } catch {
+    return null;
+  }
 }
