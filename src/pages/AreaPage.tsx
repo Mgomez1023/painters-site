@@ -1,6 +1,7 @@
 import {areaServiceLinks, type AreaPageData} from '../data/areas';
 import {EmailSignupCTA} from '../components/EmailSignupCTA';
 import {areaImageMap} from '../data/pageImages';
+import {buildAreaServiceSchema, buildFaqSchema} from '../data/seoSchemas';
 import {
   CheckList,
   ContentBand,
@@ -15,6 +16,14 @@ import {SeoHead} from './SeoHead';
 
 export function AreaPage({area}: {area: AreaPageData}) {
   const [featureImage] = areaImageMap[area.slug] ?? [];
+  const faqs = [
+    ...area.faqs,
+    {
+      question: `How do I request a painting quote in ${area.city}?`,
+      answer:
+        'Call/text 708-420-1260 or send the project details through the quote form. A useful request usually includes the address, surfaces, timing, and any prep or touch-up concerns.',
+    },
+  ];
 
   return (
     <>
@@ -22,6 +31,7 @@ export function AreaPage({area}: {area: AreaPageData}) {
         title={area.metaTitle}
         description={area.metaDescription}
         path={`/areas/${area.slug}`}
+        jsonLd={[buildAreaServiceSchema(area), buildFaqSchema(faqs)]}
       />
       <PageHero eyebrow="Service Area" title={area.h1} intro={area.intro} />
       {featureImage ? (
@@ -77,7 +87,7 @@ export function AreaPage({area}: {area: AreaPageData}) {
           </div>
         </div>
       </ContentBand>
-      <FaqSection faqs={area.faqs} />
+      <FaqSection faqs={faqs} />
       <QuoteCta
         title={`Request a free painting quote in ${area.city}`}
         text="Call/text 708-420-1260 or send the details through the quote form."

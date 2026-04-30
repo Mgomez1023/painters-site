@@ -2,6 +2,7 @@ import type {ServicePageData} from '../data/services';
 import {EmailSignupCTA} from '../components/EmailSignupCTA';
 import {blogPosts} from '../data/blog';
 import {serviceImageMap} from '../data/pageImages';
+import {buildFaqSchema, buildServiceSchema} from '../data/seoSchemas';
 import {
   CheckList,
   ContentBand,
@@ -29,6 +30,7 @@ export function ServicePage({service}: {service: ServicePageData}) {
         title={service.metaTitle}
         description={service.metaDescription}
         path={`/services/${service.slug}`}
+        jsonLd={[buildServiceSchema(service), buildFaqSchema(service.faqs)]}
       />
       <PageHero eyebrow="Painting Services" title={service.h1} intro={service.intro} />
       {featureImage ? (

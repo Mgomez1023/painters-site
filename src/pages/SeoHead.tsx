@@ -6,15 +6,21 @@ type SeoHeadProps = {
   title: string;
   description: string;
   path: string;
+  jsonLd?: Record<string, unknown> | Array<Record<string, unknown>>;
 };
 
-export function SeoHead({title, description, path}: SeoHeadProps) {
+export function SeoHead({title, description, path, jsonLd}: SeoHeadProps) {
   useEffect(() => {
     document.title = title;
 
     setMetaTag('description', description);
     setCanonical(path);
-  }, [description, path, title]);
+    setJsonLd(jsonLd);
+
+    return () => {
+      removeManagedJsonLd();
+    };
+  }, [description, jsonLd, path, title]);
 
   return null;
 }
@@ -41,4 +47,29 @@ function setCanonical(path: string) {
   }
 
   tag.href = `${siteOrigin}${path}`;
+}
+
+function setJsonLd(jsonLd: SeoHeadProps['jsonLd']) {
+  removeManagedJsonLd();
+
+  if (!jsonLd) {
+    return;
+  }
+
+  const schemas = Array.isArray(jsonLd) ? jsonLd : [jsonLd];
+
+  schemas.forEach((schema, index) => {
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.dataset.seoManaged = 'true';
+    script.dataset.seoIndex = String(index);
+    script.textContent = JSON.stringify(schema);
+    document.head.appendChild(script);
+  });
+}
+
+function removeManagedJsonLd() {
+  document
+    .querySelectorAll<HTMLScriptElement>('script[data-seo-managed="true"]')
+    .forEach((script) => script.remove());
 }

@@ -34,6 +34,7 @@ import {portfolioRoute} from './features/photos/shared';
 import {areaPages} from './data/areas';
 import {blogPosts} from './data/blog';
 import {servicePages} from './data/services';
+import {buildLocalBusinessSchema} from './data/seoSchemas';
 import {AreaPage} from './pages/AreaPage';
 import {AreasIndex} from './pages/AreasIndex';
 import {BlogIndex} from './pages/BlogIndex';
@@ -102,14 +103,14 @@ const Navbar = ({isSubPage}: {isSubPage: boolean}) => {
         {label: 'Areas', href: '/areas'},
         {label: 'Blog', href: '/blog'},
         {label: 'Photos', href: portfolioRoute},
-        {label: 'Contact', href: '/#contact'},
+        {label: 'Contact', href: '/contact'},
       ]
     : [
         {label: 'Services', href: '/services'},
         {label: 'Areas', href: '/areas'},
         {label: 'Blog', href: '/blog'},
         {label: 'Photos', href: portfolioRoute},
-        {label: 'Contact', href: '#contact'},
+        {label: 'Contact', href: '/contact'},
       ];
 
   const ctaHref = isSubPage ? '/#quote' : '#quote';
@@ -174,7 +175,12 @@ const Navbar = ({isSubPage}: {isSubPage: boolean}) => {
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center justify-self-end">
-            <button onClick={() => setIsOpen(!isOpen)} className={`p-2 transition-colors duration-500 ${scrolled ? 'text-ink' : 'text-white'}`}>
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className={`p-2 transition-colors duration-500 ${scrolled ? 'text-ink' : 'text-white'}`}
+              aria-label={isOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              aria-expanded={isOpen}
+            >
               {isOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
@@ -314,10 +320,11 @@ const QuoteFormSection = () => {
             
             <div className="lg:col-span-2">
               <form className="grid grid-cols-1 md:grid-cols-2 gap-3" onSubmit={quoteForm.handleSubmit}>
-                <input
+            <input
                   type="text"
                   name="fullName"
                   placeholder="Full Name"
+                  aria-label="Full name"
                   className="form-input"
                   value={quoteForm.values.fullName}
                   onChange={quoteForm.handleChange}
@@ -327,6 +334,7 @@ const QuoteFormSection = () => {
                   type="tel"
                   name="phone"
                   placeholder="Phone Number"
+                  aria-label="Phone number"
                   className="form-input"
                   value={quoteForm.values.phone}
                   onChange={quoteForm.handleChange}
@@ -336,6 +344,7 @@ const QuoteFormSection = () => {
                   type="email"
                   name="email"
                   placeholder="Email Address"
+                  aria-label="Email address"
                   className="form-input"
                   value={quoteForm.values.email}
                   onChange={quoteForm.handleChange}
@@ -343,6 +352,7 @@ const QuoteFormSection = () => {
                 />
                 <select
                   name="projectType"
+                  aria-label="Project type"
                   className="form-input appearance-none bg-no-repeat bg-[right_1rem_center]"
                   value={quoteForm.values.projectType}
                   onChange={quoteForm.handleChange}
@@ -357,6 +367,7 @@ const QuoteFormSection = () => {
                 <textarea
                   name="message"
                   placeholder="Tell us about your project..."
+                  aria-label="Project details"
                   className="form-input md:col-span-2 h-20 resize-none"
                   value={quoteForm.values.message}
                   onChange={quoteForm.handleChange}
@@ -613,6 +624,7 @@ const ContactSection = () => {
                   <input
                     type="text"
                     name="fullName"
+                    aria-label="Full name"
                     className="form-input"
                     value={contactForm.values.fullName}
                     onChange={contactForm.handleChange}
@@ -624,6 +636,7 @@ const ContactSection = () => {
                   <input
                     type="email"
                     name="email"
+                    aria-label="Email address"
                     className="form-input"
                     value={contactForm.values.email}
                     onChange={contactForm.handleChange}
@@ -636,6 +649,7 @@ const ContactSection = () => {
                 <input
                   type="text"
                   name="subject"
+                  aria-label="Message subject"
                   className="form-input"
                   value={contactForm.values.subject}
                   onChange={contactForm.handleChange}
@@ -646,6 +660,7 @@ const ContactSection = () => {
                 <label className="text-[9px] font-bold uppercase tracking-widest text-gray-400">Message</label>
                 <textarea
                   name="message"
+                  aria-label="Message"
                   className="form-input h-28 resize-none"
                   value={contactForm.values.message}
                   onChange={contactForm.handleChange}
@@ -699,9 +714,9 @@ const Footer = ({
               Clean prep, sharp lines, premium finishes, and clear estimates for Chicago and North Shore homes.
             </p>
             <div className="flex gap-4">
-              <a href="#" className="text-white/30 hover:text-gold-accent transition-colors"><Instagram size={16} /></a>
-              <a href="#" className="text-white/30 hover:text-gold-accent transition-colors"><Facebook size={16} /></a>
-              <a href="#" className="text-white/30 hover:text-gold-accent transition-colors"><Linkedin size={16} /></a>
+              <a href="#" aria-label="Instagram" className="text-white/30 hover:text-gold-accent transition-colors"><Instagram size={16} /></a>
+              <a href="#" aria-label="Facebook" className="text-white/30 hover:text-gold-accent transition-colors"><Facebook size={16} /></a>
+              <a href="#" aria-label="LinkedIn" className="text-white/30 hover:text-gold-accent transition-colors"><Linkedin size={16} /></a>
             </div>
           </div>
           
@@ -805,6 +820,64 @@ const NotFoundPage = () => (
   </>
 );
 
+const ContactPage = () => (
+  <>
+    <SeoHead
+      title="Contact Marom Painting | Request a Free Quote"
+      description="Contact Marom Painting for interior painting, exterior painting, trim work, cabinet painting, touch-ups, and clean finishing work across Chicago and the North Shore."
+      path="/contact"
+    />
+    <PageRouteHero
+      eyebrow="Contact"
+      title="Request a free painting quote."
+      intro="Tell us about the rooms, trim, cabinets, exterior details, or touch-ups you want refreshed. Marom Painting serves Chicago and North Shore homeowners with clean prep and clear estimates."
+    />
+    <QuoteFormSection />
+    <ContactSection />
+  </>
+);
+
+const PageRouteHero = ({
+  eyebrow,
+  title,
+  intro,
+}: {
+  eyebrow: string;
+  title: string;
+  intro: string;
+}) => (
+  <section className="bg-primary pt-32 pb-12 text-white md:pt-36 md:pb-16">
+    <div className="section-container">
+      <div className="max-w-3xl">
+        <div className="mb-4 flex items-center gap-3">
+          <div className="h-px w-10 bg-gold-accent"></div>
+          <span className="text-[10px] font-bold uppercase tracking-[0.38em] text-gold-accent">
+            {eyebrow}
+          </span>
+        </div>
+        <h1 className="text-4xl font-bold leading-tight text-balance md:text-5xl">
+          {title}
+        </h1>
+        <p className="mt-5 max-w-2xl text-sm leading-relaxed text-white/72 md:text-base">
+          {intro}
+        </p>
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <a href="#quote" className="btn-gold text-center">
+            Request a Free Quote
+          </a>
+          <a
+            href="tel:7084201260"
+            className="inline-flex items-center justify-center gap-2 border border-white/25 px-8 py-4 text-xs font-semibold uppercase tracking-widest text-white transition-colors hover:bg-white hover:text-primary"
+          >
+            <Phone size={15} />
+            Call/Text 708-420-1260
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
 export default function App() {
   const {session, isLoading, isSubmitting, login, logout} = useAdminSession();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -853,11 +926,18 @@ export default function App() {
       <Navbar isSubPage={isSubPage} />
       <main>
         {isPhotosPage ? (
-          <PhotosPage
-            authenticated={session.authenticated}
-            adminEmail={session.email}
-            onLogout={logout}
-          />
+          <>
+            <SeoHead
+              title="Painting Project Photos | Marom Painting"
+              description="Browse Marom Painting project photos showing interior painting, trim details, clean wall finishes, and painting work across Chicago and the North Shore."
+              path="/photos"
+            />
+            <PhotosPage
+              authenticated={session.authenticated}
+              adminEmail={session.email}
+              onLogout={logout}
+            />
+          </>
         ) : currentPathname === '/services' ? (
           <ServicesIndex />
         ) : activeService ? (
@@ -870,6 +950,8 @@ export default function App() {
           <BlogIndex />
         ) : activeBlogPost ? (
           <BlogPostPage post={activeBlogPost} />
+        ) : currentPathname === '/contact' ? (
+          <ContactPage />
         ) : currentPathname !== '/' ? (
           <NotFoundPage />
         ) : (
@@ -878,6 +960,7 @@ export default function App() {
               title="Marom Painting | Painting & Trim in Chicago and North Shore"
               description="Marom Painting provides interior painting, exterior painting, trim work, cabinet painting, touch-ups, prep, patching, and clean finishing work across Chicago and the North Shore."
               path="/"
+              jsonLd={buildLocalBusinessSchema()}
             />
             <Hero />
             <QuoteFormSection />

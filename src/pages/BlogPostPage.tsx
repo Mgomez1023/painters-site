@@ -1,6 +1,7 @@
 import type {BlogPostData} from '../data/blog';
 import {EmailSignupCTA} from '../components/EmailSignupCTA';
 import {blogImageMap} from '../data/pageImages';
+import {buildBlogPostingSchema} from '../data/seoSchemas';
 import {
   ContentBand,
   ImageFeature,
@@ -20,6 +21,7 @@ export function BlogPostPage({post}: {post: BlogPostData}) {
         title={post.metaTitle}
         description={post.metaDescription}
         path={`/blog/${post.slug}`}
+        jsonLd={buildBlogPostingSchema(post)}
       />
       <PageHero eyebrow="Painting Resource" title={post.title} intro={post.intro} />
       {heroImage ? (
