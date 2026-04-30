@@ -176,6 +176,11 @@ function validateNewsletterSignup(
   input: Record<string, unknown>,
 ): ValidationResult {
   const email = getRequiredString(input.email);
+  const fullName = getRequiredString(input.fullName) || 'Newsletter Subscriber';
+  const subject = getRequiredString(input.subject) || 'Newsletter signup';
+  const message =
+    getRequiredString(input.message) ||
+    'Requested seasonal maintenance tips and project inspiration.';
 
   if (!email) {
     return invalidSubmission('Please provide your email address.');
@@ -189,10 +194,10 @@ function validateNewsletterSignup(
     ok: true,
     submission: {
       formType: 'newsletter-signup',
-      fullName: 'Newsletter Subscriber',
+      fullName,
       email,
-      subject: 'Newsletter signup',
-      message: 'Requested seasonal maintenance tips and project inspiration.',
+      subject,
+      message,
     },
   };
 }

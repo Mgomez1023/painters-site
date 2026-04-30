@@ -50,7 +50,32 @@ Notes:
 3. Set all environment variables in Project Settings.
 4. Deploy.
 
-`/photos` is a client-side Vite route, so `vercel.json` rewrites that path to `index.html` for direct loads.
+`/photos`, `/services/*`, `/areas/*`, and `/blog/*` are client-side Vite routes, so `vercel.json` rewrites those paths to `index.html` for direct loads.
+
+## Public SEO routes
+
+The site includes data-driven public SEO pages for Marom Painting:
+
+- `/services`
+- `/services/interior-painting`
+- `/services/exterior-painting`
+- `/services/trim-work`
+- `/services/cabinet-painting`
+- `/services/touch-ups`
+- `/areas`
+- `/areas/chicago-painting`
+- `/areas/oak-park-painting`
+- `/areas/berwyn-painting`
+- `/areas/cicero-painting`
+- `/areas/evanston-painting`
+- `/areas/skokie-painting`
+- `/areas/north-shore-painting`
+- `/blog`
+- `/blog/top-5-ways-to-refresh-your-kitchen`
+- `/blog/how-to-choose-interior-paint-colors`
+- `/blog/when-should-you-repaint-trim`
+
+Content lives in `src/data/services.ts`, `src/data/areas.ts`, and `src/data/blog.ts`. The page components render those records from `src/pages/` and update document title, meta description, and canonical URL on navigation.
 
 ## Portfolio photo system
 

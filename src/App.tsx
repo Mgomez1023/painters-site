@@ -26,13 +26,23 @@ import workPhoto5990 from './WorkPhotos/WorkPhotos/IMG_5955.png';
 import aboutPhoto6038 from './WorkPhotos/WorkPhotos/IMG_5973.png';
 import heroPhoto1 from './WorkPhotos/WorkPhotos/Hero1.png';
 import {useContactForm} from './features/contact/useContactForm';
+import {EmailSignupCTA} from './components/EmailSignupCTA';
 import {LoginModal} from './features/photos/LoginModal';
 import {PhotosPage} from './features/photos/PhotosPage';
 import {useAdminSession} from './features/photos/useAdminSession';
 import {portfolioRoute} from './features/photos/shared';
+import {areaPages} from './data/areas';
+import {blogPosts} from './data/blog';
+import {servicePages} from './data/services';
+import {AreaPage} from './pages/AreaPage';
+import {AreasIndex} from './pages/AreasIndex';
+import {BlogIndex} from './pages/BlogIndex';
+import {BlogPostPage} from './pages/BlogPostPage';
+import {ServicePage} from './pages/ServicePage';
+import {ServicesIndex} from './pages/ServicesIndex';
+import {SeoHead} from './pages/SeoHead';
 import {
   initialContactFormValues,
-  initialNewsletterFormValues,
   initialQuoteFormValues,
   type SubmissionStatus,
 } from './features/contact/types';
@@ -66,12 +76,12 @@ const SubmissionFeedback = ({
   );
 };
 
-const Navbar = ({isPhotosPage}: {isPhotosPage: boolean}) => {
+const Navbar = ({isSubPage}: {isSubPage: boolean}) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(isPhotosPage);
+  const [scrolled, setScrolled] = useState(isSubPage);
 
   useEffect(() => {
-    if (isPhotosPage) {
+    if (isSubPage) {
       setScrolled(true);
       return;
     }
@@ -83,22 +93,26 @@ const Navbar = ({isPhotosPage}: {isPhotosPage: boolean}) => {
     handleScroll();
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [isPhotosPage]);
+  }, [isSubPage]);
 
-  const navLinks = isPhotosPage
+  const navLinks = isSubPage
     ? [
         {label: 'Home', href: '/'},
+        {label: 'Services', href: '/services'},
+        {label: 'Areas', href: '/areas'},
+        {label: 'Blog', href: '/blog'},
+        {label: 'Photos', href: portfolioRoute},
         {label: 'Contact', href: '/#contact'},
       ]
     : [
-        {label: 'Services', href: '#services'},
-        {label: 'Work', href: '#work'},
+        {label: 'Services', href: '/services'},
+        {label: 'Areas', href: '/areas'},
+        {label: 'Blog', href: '/blog'},
         {label: 'Photos', href: portfolioRoute},
-        {label: 'About', href: '#about'},
         {label: 'Contact', href: '#contact'},
       ];
 
-  const ctaHref = isPhotosPage ? '/#contact' : '#quote';
+  const ctaHref = isSubPage ? '/#quote' : '#quote';
 
   return (
     <nav className={`fixed w-full z-50 transition-all duration-500 ${scrolled ? 'bg-white shadow-sm py-2' : 'bg-transparent py-3'}`}>
@@ -280,7 +294,7 @@ const QuoteFormSection = () => {
                 <h2 className="text-xl font-bold text-primary">Request a Free Quote</h2>
               </div>
               <p className="text-xs text-gray-500 leading-relaxed mb-5">
-                Tell us about your project and we'll get back to you within 24 hours with a detailed estimate.
+                Tell us about your project and we'll follow up with a clear estimate.
               </p>
               <div className="space-y-2.5">
                 <div className="flex items-center gap-3 text-xs font-bold text-primary uppercase tracking-wider">
@@ -293,7 +307,7 @@ const QuoteFormSection = () => {
                 </div>
                 <div className="flex items-center gap-3 text-xs font-bold text-primary uppercase tracking-wider">
                   <CheckCircle2 size={16} className="text-primary-light" />
-                  <span>Fixed price guarantee</span>
+                  <span>Clear written estimate</span>
                 </div>
               </div>
             </div>
@@ -381,7 +395,7 @@ const TrustSection = () => {
     { icon: <ShieldCheck size={40} />, title: "Impeccable Prep", desc: "Total protection for your home." },
     { icon: <Clock size={40} />, title: "On-Time Delivery", desc: "We respect your schedule." },
     { icon: <CheckCircle2 size={40} />, title: "Master Finish", desc: "Sharp lines, smooth surfaces." },
-    { icon: <MessageSquare size={40} />, title: "Clear Pricing", desc: "No hidden costs or surprises." },
+    { icon: <MessageSquare size={40} />, title: "Clear Estimates", desc: "Know the planned scope before work starts." },
   ];
 
   return (
@@ -404,28 +418,7 @@ const TrustSection = () => {
 };
 
 const Services = () => {
-  const services = [
-    { 
-      title: "Interior Painting", 
-      desc: "Flawless application using premium low-VOC paints for a durable, beautiful finish.",
-      img: "https://picsum.photos/seed/interior-paint/800/600"
-    },
-    { 
-      title: "Custom Trim Work", 
-      desc: "Expert installation and finishing of crown molding, wainscoting, and baseboards.",
-      img: "https://picsum.photos/seed/trim-work/800/600"
-    },
-    { 
-      title: "Accent Walls", 
-      desc: "Transformative color and texture that creates a sophisticated focal point in any room.",
-      img: "https://picsum.photos/seed/accent-wall/800/600"
-    },
-    { 
-      title: "Detail & Prep", 
-      desc: "Meticulous surface preparation, drywall repair, and sanding for a perfect foundation.",
-      img: "https://picsum.photos/seed/prep-work/800/600"
-    },
-  ];
+  const featuredServices = servicePages.slice(0, 4);
 
   return (
     <section id="services" className="py-10 bg-blue-bg/40 border-b border-blue-border/30">
@@ -441,18 +434,18 @@ const Services = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-blue-border/50 border border-blue-border/50 overflow-hidden shadow-sm">
-          {services.map((s, i) => (
-            <div key={i} className="group relative bg-white p-6 lg:p-8 transition-all duration-500 hover:bg-primary">
+          {featuredServices.map((service, i) => (
+            <div key={service.slug} className="group relative bg-white p-6 lg:p-8 transition-all duration-500 hover:bg-primary">
               <div className="relative z-10">
                 <span className="text-primary-light font-bold text-[9px] uppercase tracking-widest mb-3 block transition-colors group-hover:text-gold-accent">0{i + 1}</span>
-                <h4 className="text-xl font-bold text-primary mb-2 group-hover:text-white transition-colors">{s.title}</h4>
-                <p className="text-gray-500 text-sm mb-5 leading-relaxed group-hover:text-white/70 transition-colors">{s.desc}</p>
-                <a href="#contact" className="inline-flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-primary-light group-hover:text-gold-accent transition-colors">
+                <h4 className="text-xl font-bold text-primary mb-2 group-hover:text-white transition-colors">{service.title}</h4>
+                <p className="text-gray-500 text-sm mb-5 leading-relaxed group-hover:text-white/70 transition-colors">{service.intro}</p>
+                <a href={`/services/${service.slug}`} className="inline-flex items-center gap-2 text-[9px] font-bold uppercase tracking-widest text-primary-light group-hover:text-gold-accent transition-colors">
                   Learn More <ArrowRight size={14} />
                 </a>
               </div>
               <div className="absolute top-0 right-0 w-1/3 h-full opacity-0 group-hover:opacity-10 transition-opacity duration-700 pointer-events-none overflow-hidden">
-                <img src={s.img} alt="" className="w-full h-full object-cover grayscale" referrerPolicy="no-referrer" />
+                <img src={`https://picsum.photos/seed/${service.slug}/800/600`} alt="" className="w-full h-full object-cover grayscale" referrerPolicy="no-referrer" />
               </div>
             </div>
           ))}
@@ -693,28 +686,17 @@ const Footer = ({
   isAuthenticated: boolean;
   onAdminAction: () => void;
 }) => {
-  const newsletterForm = useContactForm({
-    initialValues: initialNewsletterFormValues,
-    buildPayload: (values) => ({
-      formType: 'newsletter-signup',
-      fullName: 'Newsletter Subscriber',
-      email: values.email,
-      subject: 'Newsletter signup',
-      message: 'Requested seasonal maintenance tips and project inspiration.',
-    }),
-  });
-
   return (
     <footer className="bg-primary text-white pt-12 pb-6">
       <div className="section-container">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-10">
           <div className="lg:col-span-1">
             <div className="flex flex-col mb-4">
-              <span className="text-xl font-bold tracking-tighter">CHICAGO ELITE</span>
+              <span className="text-xl font-bold tracking-tighter">Marom Painting</span>
               <span className="text-[10px] tracking-[0.3em] text-gold-accent font-bold uppercase">Painting & Trim</span>
             </div>
             <p className="text-white/50 text-[10px] leading-relaxed mb-6 max-w-xs">
-              Elevating Chicago interiors through meticulous craftsmanship and professional service since 2012.
+              Clean prep, sharp lines, premium finishes, and clear estimates for Chicago and North Shore homes.
             </p>
             <div className="flex gap-4">
               <a href="#" className="text-white/30 hover:text-gold-accent transition-colors"><Instagram size={16} /></a>
@@ -726,56 +708,53 @@ const Footer = ({
           <div>
             <h4 className="text-[9px] font-bold uppercase tracking-[0.3em] mb-4 text-white/30">Services</h4>
             <ul className="space-y-2 text-[9px] font-bold uppercase tracking-widest">
-              <li><a href="#" className="hover:text-gold-accent transition-colors">Interior Painting</a></li>
-              <li><a href="#" className="hover:text-gold-accent transition-colors">Custom Trim</a></li>
-              <li><a href="#" className="hover:text-gold-accent transition-colors">Accent Walls</a></li>
-              <li><a href="#" className="hover:text-gold-accent transition-colors">Cabinetry</a></li>
+              {servicePages.map((service) => (
+                <li key={service.slug}>
+                  <a href={`/services/${service.slug}`} className="hover:text-gold-accent transition-colors">
+                    {service.navLabel}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
           
           <div>
-            <h4 className="text-[9px] font-bold uppercase tracking-[0.3em] mb-4 text-white/30">Quick Links</h4>
+            <h4 className="text-[9px] font-bold uppercase tracking-[0.3em] mb-4 text-white/30">Service Areas</h4>
             <ul className="space-y-2 text-[9px] font-bold uppercase tracking-widest">
-              <li><a href={isPhotosPage ? '/#work' : '#work'} className="hover:text-gold-accent transition-colors">Our Work</a></li>
+              {areaPages.map((area) => (
+                <li key={area.slug}>
+                  <a href={`/areas/${area.slug}`} className="hover:text-gold-accent transition-colors">
+                    {area.city}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+          
+          <div>
+            <h4 className="text-[9px] font-bold uppercase tracking-[0.3em] mb-4 text-white/30">Resources</h4>
+            <ul className="space-y-2 text-[9px] font-bold uppercase tracking-widest">
+              <li><a href="/blog" className="hover:text-gold-accent transition-colors">Painting Tips</a></li>
+              <li><a href="/blog/top-5-ways-to-refresh-your-kitchen" className="hover:text-gold-accent transition-colors">Kitchen Refresh Ideas</a></li>
+              <li><a href={isPhotosPage ? '/#quote' : '#quote'} className="hover:text-gold-accent transition-colors">Free Quote</a></li>
               <li><a href={portfolioRoute} className="hover:text-gold-accent transition-colors">Photos</a></li>
-              <li><a href={isPhotosPage ? '/#about' : '#about'} className="hover:text-gold-accent transition-colors">About Us</a></li>
-              <li><a href={isPhotosPage ? '/#contact' : '#contact'} className="hover:text-gold-accent transition-colors">Contact</a></li>
             </ul>
           </div>
           
           <div>
             <h4 className="text-[9px] font-bold uppercase tracking-[0.3em] mb-4 text-white/30">Newsletter</h4>
-            <p className="text-[9px] text-white/40 mb-3 leading-relaxed">Join for seasonal maintenance tips and project inspiration.</p>
-            <form className="space-y-2" onSubmit={newsletterForm.handleSubmit}>
-              <div className="flex">
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Email"
-                  className="bg-white/5 border border-white/10 px-3 py-2.5 text-[9px] w-full focus:outline-none focus:border-gold-accent text-white"
-                  value={newsletterForm.values.email}
-                  onChange={newsletterForm.handleChange}
-                  required
-                />
-                <button
-                  type="submit"
-                  className="bg-gold-accent text-white px-3 py-2.5 hover:bg-white hover:text-primary transition-all disabled:cursor-not-allowed disabled:opacity-70"
-                  disabled={newsletterForm.isSubmitting}
-                  aria-busy={newsletterForm.isSubmitting}
-                >
-                  <ArrowRight size={14} />
-                </button>
-              </div>
-              <SubmissionFeedback
-                status={newsletterForm.status}
-                message={newsletterForm.feedback}
-              />
-            </form>
+            <EmailSignupCTA
+              sourceTitle="Footer newsletter signup"
+              sourcePath={
+                typeof window === 'undefined' ? '/' : window.location.pathname
+              }
+              variant="compact"
+            />
           </div>
         </div>
         
         <div className="pt-6 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-[8px] font-bold uppercase tracking-widest text-white/20">
-          <p>© 2026 Chicago Elite Painting & Trim. All rights reserved.</p>
+          <p>© 2026 Marom Painting. All rights reserved.</p>
           <div className="flex flex-wrap items-center justify-center gap-6">
             <a href="#" className="hover:text-white transition-colors">Privacy</a>
             <a href="#" className="hover:text-white transition-colors">Terms</a>
@@ -794,6 +773,38 @@ const Footer = ({
   );
 };
 
+const NotFoundPage = () => (
+  <>
+    <SeoHead
+      title="Page Not Found | Marom Painting"
+      description="The Marom Painting page you are looking for could not be found."
+      path="/404"
+    />
+    <section className="bg-soft-bg pt-32 pb-16">
+      <div className="section-container">
+        <div className="max-w-2xl border border-blue-border bg-white p-8 shadow-sm">
+          <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-primary-light">
+            Marom Painting
+          </p>
+          <h1 className="text-3xl font-bold text-primary">Page not found</h1>
+          <p className="mt-3 text-sm leading-relaxed text-gray-500">
+            The page may have moved. You can return home, browse painting services,
+            or request a free quote.
+          </p>
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+            <a href="/" className="btn-outline text-center">
+              Home
+            </a>
+            <a href="/services" className="btn-gold text-center">
+              Services
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </>
+);
+
 export default function App() {
   const {session, isLoading, isSubmitting, login, logout} = useAdminSession();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -802,6 +813,19 @@ export default function App() {
       ? '/'
       : normalizePathname(window.location.pathname);
   const isPhotosPage = currentPathname === portfolioRoute;
+  const isSubPage = currentPathname !== '/';
+  const serviceSlug = currentPathname.startsWith('/services/')
+    ? currentPathname.replace('/services/', '')
+    : '';
+  const areaSlug = currentPathname.startsWith('/areas/')
+    ? currentPathname.replace('/areas/', '')
+    : '';
+  const blogSlug = currentPathname.startsWith('/blog/')
+    ? currentPathname.replace('/blog/', '')
+    : '';
+  const activeService = servicePages.find((service) => service.slug === serviceSlug);
+  const activeArea = areaPages.find((area) => area.slug === areaSlug);
+  const activeBlogPost = blogPosts.find((post) => post.slug === blogSlug);
 
   async function handleLogin(email: string, password: string) {
     await login(email, password);
@@ -826,7 +850,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen selection:bg-accent-blue selection:text-white">
-      <Navbar isPhotosPage={isPhotosPage} />
+      <Navbar isSubPage={isSubPage} />
       <main>
         {isPhotosPage ? (
           <PhotosPage
@@ -834,8 +858,27 @@ export default function App() {
             adminEmail={session.email}
             onLogout={logout}
           />
+        ) : currentPathname === '/services' ? (
+          <ServicesIndex />
+        ) : activeService ? (
+          <ServicePage service={activeService} />
+        ) : currentPathname === '/areas' ? (
+          <AreasIndex />
+        ) : activeArea ? (
+          <AreaPage area={activeArea} />
+        ) : currentPathname === '/blog' ? (
+          <BlogIndex />
+        ) : activeBlogPost ? (
+          <BlogPostPage post={activeBlogPost} />
+        ) : currentPathname !== '/' ? (
+          <NotFoundPage />
         ) : (
           <>
+            <SeoHead
+              title="Marom Painting | Painting & Trim in Chicago and North Shore"
+              description="Marom Painting provides interior painting, exterior painting, trim work, cabinet painting, touch-ups, prep, patching, and clean finishing work across Chicago and the North Shore."
+              path="/"
+            />
             <Hero />
             <QuoteFormSection />
             <TrustSection />
@@ -847,7 +890,7 @@ export default function App() {
         )}
       </main>
       <Footer
-        isPhotosPage={isPhotosPage}
+        isPhotosPage={isSubPage}
         isAuthenticated={session.authenticated}
         onAdminAction={handleAdminAction}
       />
